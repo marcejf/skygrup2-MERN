@@ -1,0 +1,10 @@
+{
+    "less.validate": false,
+    "css.lint.unknownAtRules": "ignore",
+    "emmet.includeLanguages": {
+        "javascript": "html",
+        "javascriptreact": "html",
+        "typescriptreact": "html"
+      }
+    
+}
