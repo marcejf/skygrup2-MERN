@@ -48,9 +48,9 @@ export const create =  async (req, res) => {
 
         
         res.cookie("token", token, {
-            httpOnly: process.env.NODE_ENV === 'Desarrollo',
-            secure : true,
-            sameSite: 'none',
+            httpOnly: true,  // debe ser true pos seguriidad
+            secure : process.env.NODE_ENV !== 'development',   // solo true para produccion 
+            sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',   //nome para produccion
         });
 
         
@@ -94,15 +94,15 @@ export const login = async(req, res) => {
 
         //respuesta del cookie
         res.cookie("token", token,{
-            httpOnly: process.env.NODE_ENV === 'Desarrollo',
-            secure : true,
+            httpOnly: true,
+            secure : false,             //process.env.NODE_ENV === "production",
             sameSite: 'none',
         });
 
         //respuesta json 
         res.json({
             id:userFound._id,
-            email:userFound,email,
+            email:userFound.email,
         });
 
     } catch(error){

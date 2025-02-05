@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+ import mongoose from "mongoose";
 
 
 // squema para enviar datos 
@@ -16,6 +16,7 @@ const UserSquema = new mongoose.Schema({
     role:{
         type:String,
         required: true,
+        enum: ['admin', 'user1'], default:"user"
     },
 
 });  

@@ -29,7 +29,9 @@ export const createPasajeros = async (req, res) => {
 
 export const getPasajeros = async (req, res) => {
     try{
-        const pasajeros = await Pasajeros.find();
+        const pasajeros = await Pasajeros.find({}, "_id documento nombres apellidos pais edad telefono email");
+        console.log("pasajeros enviados:", pasajeros);
+        
         res.json(pasajeros);
     } catch (error) {
         res.status(500).json({message: error.message});

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../config..js";
+import { JWT_SECRET } from "../config.js";
+
 
 
 
@@ -26,3 +27,15 @@ export const auth = (req, res, next) => {
         res.status(500).json({ message: error.message});
     }
 };
+
+export const check = (role) => {
+    return (req, res, next) => {
+        if (req.user && req.user.role === role){
+            next(); 
+        } else{
+            res.status(403).json({message: "acceso denegado. permiso denegado"});
+        }
+    };
+};
+
+ 

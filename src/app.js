@@ -12,7 +12,8 @@ const app = express(); //inicializa el servidor
 
 app.use(cors(
     {
-        origin: 'http://localhost:5173',
+        origin: 'http://localhost:5173', //puerto del frontend
+        credentials: true, //habilita credenciales para cookies 
     }
 ))
 
