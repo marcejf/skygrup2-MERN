@@ -16,4 +16,4 @@ router.delete('/deletePasajero/:id', deletePasajero);
 router.get('/buscarPasajero', buscarPasajero);
 
 
-export default router;
+export default router;    

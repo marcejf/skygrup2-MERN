@@ -33,7 +33,7 @@ export const getPasajeros = async (req, res) => {
         console.log("pasajeros enviados:", pasajeros);
         
         res.json(pasajeros);
-    } catch (error) {
+    } catch (error) {  
         res.status(500).json({message: error.message});
     }
 

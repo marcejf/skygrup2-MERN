@@ -2,7 +2,7 @@ import { z } from "zod";
 
 
 
-export const createPasajeroSchema = z.object({
+export const createPasajeroSchema = z.object({  
     documento: z
     .number({
         required_error:'El documento es requerido',

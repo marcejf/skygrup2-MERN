@@ -5,10 +5,15 @@ import authRoutes from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
 import pasajerosRoutes from './routes/pasajero.route.js';
 import cors from "cors";
+import reservaRouter from "./routes/reserva.route.js"
+import vuelosRoutes from "./routes/vuelos.route.js";
+import avionRoutes from "./routes/avion.route.js";
 
 
 
 const app = express(); //inicializa el servidor 
+
+
 
 app.use(cors(
     {
@@ -18,9 +23,13 @@ app.use(cors(
 ))
 
 app.use(morgan('dev')); // esto muestra la peticiones  en el servidor 
-app.use(express.json());
 app.use('/api', authRoutes);
 app.use(cookieParser());
+app.use(express.json());
 app.use('/api', pasajerosRoutes);
+app.use('/api', reservaRouter);  
+app.use('/api', vuelosRoutes);
+app.use('/api', avionRoutes);
+
 
 export default app;
