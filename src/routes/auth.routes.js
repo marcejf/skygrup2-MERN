@@ -26,4 +26,4 @@ router.get("/superadmin", auth, check("superadmin"), (req, res) => {
   });
 
 
-export default router;
+export default router;        

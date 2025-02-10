@@ -1,4 +1,5 @@
 import Vuelos from "../models/vuelo.model.js";
+import Aviones from "../models/aviones.model.js";
 
 
 //crear vuelos 
@@ -6,8 +7,7 @@ export const createVuelos = async (req, res) => {
     console.log('datos de vuelos recibidos', req.body); 
 
     try { 
-    const { 
-        pasajeroId,
+    const {   
         numeroVuelo, 
         aerolinea, 
         origen, 
@@ -18,23 +18,45 @@ export const createVuelos = async (req, res) => {
         estado
     }=  req.body
 
+
+    const vueloExistente = await Vuelos.findOne({numeroVuelo});
+    if (vueloExistente) {
+        return res,status(400).json({ message: "el numero de vuelo ya existe"});
+    }
+     // convuerte las fechas en formato date
+
     const fechaSalidaISO = fechaSalida ? new Date(fechaSalida) : null;
     const fechaLlegadaISO = fechaLlegada ? new Date(fechaLlegada) : null;
     
     if (isNaN(fechaSalidaISO.getTime()) || isNaN(fechaLlegadaISO.getTime())) {
         return res.status(400).json({message:"fecha no valida"});
     }
+
+    const avion = await  Avion.findById(avionId);
+    if(!avion) {
+        return res.status(400).json({ message: " el avion seleccionado no existe"});
+    }
+
+    // validar la capacidad
+
+    if (asientosDisponibles > avion.capacidad) {
+        return res.status(400).jsom({ message:" los asientos disponibles denben ser mayor a la capacidad del avion"});
+    }
+
+
     const newVuelo  = new Vuelos({
-        pasajeroId,
         numeroVuelo, 
         aerolinea, 
         origen, 
         destino, 
         fechaSalida :  fechaSalidaISO, 
         fechaLlegada : fechaLlegadaISO, 
+        vueloId,
         asientosDisponibles, 
         estado
         });
+
+
         await newVuelo.save();
 
         console.log(newVuelo.fechaSalida); // Verifica que sea un objeto Date
@@ -51,7 +73,8 @@ export const createVuelos = async (req, res) => {
 //listar vuelos
 export const getVuelos = async  (req, res) => {
     try {
-        const vuelos = await Vuelos.find({}, "_id numeroVuelo aerolinea origen destino fechaSalida fechaLlegada asientosDisponibles estado");
+        const vuelos = await Vuelos.find({}, "_id numeroVuelo aerolinea origen destino fechaSalida fechaLlegada asientosDisponibles estado ")
+        .populate("avionId", "modelo capacidad");
 
         res.json(vuelos);
 
@@ -66,7 +89,7 @@ export const getVuelos = async  (req, res) => {
 export const searchVuelo = async (req, res) => {
     try {
         const vuelos = await Vuelos.findById(req.params.id)
-        .populate('pasajeroId');
+        .populate( "vueloId", "modelo capacidad");
 
         if(!vuelos) {
             return res.status(400).json({message: "vuelo no encontrado"});
@@ -79,18 +102,48 @@ export const searchVuelo = async (req, res) => {
 
 // actualizar vuelo por id
 
-export const updateVuelo = async (req,res) => {
+export const updateVuelo = async (req, res) => {
     try {
-        const updateVuelo = await  Vuelos.findByIdAndUpdate(req.params.id, req.body, { new: true});
+        const { fechaSalida, fechaLlegada, avionId, asientosDisponibles } = req.body;
 
-        if (!updateVuelo) {
-            return res.status(400).json({ message:"Vuelo no encontrado"});
+        // Si se envían fechas, validarlas
+        if (fechaSalida && fechaLlegada) {
+            const fechaSalidaISO = new Date(fechaSalida);
+            const fechaLlegadaISO = new Date(fechaLlegada);
+
+            if (isNaN(fechaSalidaISO.getTime()) || isNaN(fechaLlegadaISO.getTime())) {
+                return res.status(400).json({ message: "Fecha no válida." });
+            }
+            if (fechaSalidaISO >= fechaLlegadaISO) {
+                return res.status(400).json({ message: "La fecha de salida debe ser menor que la de llegada." });
+            }
         }
-        res.status(200).json(updateVuelo);
-    }catch (error) {
-        res.status(400).json({ error: error.message});
+
+        // Si se envía un nuevo avión, verificar su capacidad
+        if (avionId) {
+            const avion = await Aviones.findById(avionId);
+            if (!avion) {
+                return res.status(400).json({ message: "El avión seleccionado no existe." });
+            }
+            if (asientosDisponibles && asientosDisponibles > avion.capacidad) {
+                return res.status(400).json({ message: "Los asientos disponibles no pueden superar la capacidad del avión." });
+            }
+        }
+
+        const vueloActualizado = await Vuelos.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate("avionId", "modelo capacidad");
+
+        if (!vueloActualizado) {
+            return res.status(404).json({ message: "Vuelo no encontrado." });
+        }
+
+        res.status(200).json(vueloActualizado);
+
+    } catch (error) {
+        console.error("Error al actualizar vuelo:", error);
+        res.status(500).json({ message: error.message });
     }
 };
+
 
 
 // eliminar por id

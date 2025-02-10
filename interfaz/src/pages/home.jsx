@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaPlane, FaSuitcase, FaFileInvoice, FaUser, FaTicketAlt, FaTruck, FaClipboardList, FaMapMarkedAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaPlane,FaCalendar,  FaSuitcase, FaFileInvoice, FaUser, FaTicketAlt, FaTruck, FaClipboardList, FaMapMarkedAlt, FaSignOutAlt } from "react-icons/fa";
 import AvionHome from '../img/avionhome.jpg';
 import Cartagena2 from '../img/cartagena2.jfif';
 import Lima from '../img/lima.jfif';
@@ -14,11 +14,11 @@ export default function Home() {
     <div className="min-h-screen">
       <nav className="bg-blue-700 text-white py-6 px-3 shadow-md">
         <div className="flex flex-wrap justify-center space-x-4 md:space-x-8 overflow-x-auto">
+        <span onClick={() => navigate("/agenda")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
+            <FaCalendar size={20} className="mr-2" /> Agenda
+          </span>
           <span onClick={() => navigate("/aviones")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
             <FaPlane size={20} className="mr-2" /> Aviones
-          </span>
-          <span onClick={() => navigate("/aeropuertos")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
-            <FaMapMarkedAlt size={20} className="mr-2" /> Aeropuertos
           </span>
           <span onClick={() => navigate("/equipajes")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
             <FaSuitcase size={20} className="mr-2" /> Equipajes
@@ -37,6 +37,9 @@ export default function Home() {
           </span>
           <span onClick={() => navigate("/reservas")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
             <FaClipboardList size={20} className="mr-2" /> Reservas
+          </span>
+          <span onClick={() => navigate("/vuelos")} className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
+            <FaClipboardList size={20} className="mr-2" /> vuelos
           </span>
 
           {/* Menú desplegable con Headless UI */}

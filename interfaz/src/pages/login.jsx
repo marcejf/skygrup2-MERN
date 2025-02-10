@@ -1,22 +1,37 @@
 import { useState } from "react";
 import axios from "axios";
 import  UserAvatar from "../img/avionnn2.jfif";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if(!email || !password){
+      setError("todos los campos son obligatorios");
+    }
+
+
     try {
+      console.log("datos enviados al backend", {email, password});
       const response = await axios.post(
         "http://localhost:4000/api/login", 
         { email, password },
-        { withCredentials: true } // Permitir el envío de cookies
+        { withCredentials: true,
+          headers: {"Content-Type" : "application/json"}
+        } // Permitir el envío de cookies
       );
       console.log("Login successful", response.data);
+
+      navigate("/home");
+
+      
     } catch (err) {
         console.error("Error en el inicio de sesión:", err.response?.data || err.message);
         setError(err.response?.data?.message || "Error en el inicio de sesión.");

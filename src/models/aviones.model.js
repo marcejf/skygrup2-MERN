@@ -7,7 +7,6 @@ const avionesSchema = new mongoose.Schema({
     pasajeroId: {
         type:String,
         ref: "Pasajeros",
-        required:true,
     },
     matricula : {
         type: String,
@@ -24,15 +23,17 @@ const avionesSchema = new mongoose.Schema({
     capacidad: {
         type: Number,
         required: true,
+        min: 1
     },
     rangoVueloKM: {
         type: Number,
         required: true,
     },
     fechaFabricacion: {
-        type: Number,
+        type: Date,
         required: true
     }
 });
 
 export default mongoose.model("Aviones", avionesSchema);
+  

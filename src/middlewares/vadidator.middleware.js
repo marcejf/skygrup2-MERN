@@ -5,7 +5,8 @@ export const validateSchema =  (schema) => {
             next();
 
         } catch (error) {
-            res.status(400).json({ message:error.errors.map((error) =>  error.message)});
+            console.log("error de validacion", error.errors);
+            return res.status(400).json({ message:error.errors.map((error) =>  error.message)});
         }
     }
 };

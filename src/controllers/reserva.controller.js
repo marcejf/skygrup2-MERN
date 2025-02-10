@@ -1,10 +1,10 @@
 import Reserva from "../models/reserva.model.js";   
 
-//crear reserva  
+//crear reserva     
 
 export const crearReserva = async (req, res) => {
     try {
-        const {pasajeroId, vueloId, numAsiento, estadoReserva, estadoPago,} = req.body;
+        const {pasajeroId, vueloId, numAsiento, estadoReserva, estadoPago} = req.body;
 
 
         const nuevaReserva = new Reserva({
@@ -27,7 +27,10 @@ export const crearReserva = async (req, res) => {
 
 export const obtenerReservas = async (req, res) => {
     try {
-        const reservas = await Reserva.find().populate("pasajeroId vueloId");  
+        const reservas = await Reserva.find()
+        .populate("pasajeroId", "nombres apellidos email telefono")
+        .populate("vueloId", "origen destino fechaSalida");
+        
         res.json(reservas);
 
     } catch (error) {

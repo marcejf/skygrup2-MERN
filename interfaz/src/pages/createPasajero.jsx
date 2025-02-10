@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Necesario para usar navigate
-import { FaHome, FaPlane, FaMapMarkedAlt, FaSuitcase, FaFileInvoice, FaTicketAlt, FaTruck, FaClipboardList, FaUser, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Asegúrate de importar los íconos
+import { FaHome, FaCalendar, FaPlane, FaMapMarkedAlt, FaSuitcase, FaFileInvoice, FaTicketAlt, FaTruck, FaClipboardList, FaUser, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Asegúrate de importar los íconos
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 //crear pasajeros 
@@ -156,12 +156,13 @@ function CreatePasajero() {
         <span onClick={() => navigate("/home")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
             <FaHome size={20} className="mr-2" /> Home
           </span>
+          <span onClick={() => navigate("/agenda")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
+            <FaCalendar size={20} className="mr-2" /> Agenda
+          </span>
           <span onClick={() => navigate("/aviones")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
             <FaPlane size={20} className="mr-2" /> Aviones
           </span>
-          <span onClick={() => navigate("/aeropuertos")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
-            <FaMapMarkedAlt size={20} className="mr-2" /> Aeropuertos
-          </span>
+          
           <span onClick={() => navigate("/equipajes")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
             <FaSuitcase size={20} className="mr-2" /> Equipajes
           </span>
@@ -180,8 +181,10 @@ function CreatePasajero() {
           <span onClick={() => navigate("/reservas")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
             <FaClipboardList size={20} className="mr-2" /> Reservas
           </span>
+          <span onClick={() => navigate("/vuelos")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
+            <FaClipboardList size={20} className="mr-2" /> Vuelos
+          </span>
 
-          {/* Menú desplegable con Headless UI */}
           <Menu as="div" className=" flex-auto left-0 right-auto ">
             <Menu.Button className="flex items-center cursor-pointer hover:text-blue-300 transition-colors">
               <FaUser size={20} className="mr-2" /> Empleados

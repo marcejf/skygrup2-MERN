@@ -6,7 +6,7 @@ const reservaSchema = new mongoose.Schema(
             type: String,    
             ref:"Pasajeros",
             required:true,
-        },  
+        },     
         vueloId : {
             type:String,
             ref:"Vuelos",
@@ -18,13 +18,8 @@ const reservaSchema = new mongoose.Schema(
         },
         fechaReserva : {
             type:Date,
-            default:Date.now,
-
         },
-        estadoReserva : { 
-            type : String,
-            required : true,
-        },
+        
         estadoPago: {
             type: String,
             required: true,

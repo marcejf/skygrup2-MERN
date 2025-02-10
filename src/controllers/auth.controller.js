@@ -70,7 +70,7 @@ export const create =  async (req, res) => {
 //http://localhost:4000/api/login
 export const login = async(req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password} = req.body;
 
         const userFound= await User.findOne({ email });
 

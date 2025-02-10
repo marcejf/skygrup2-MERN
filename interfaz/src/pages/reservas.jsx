@@ -2,33 +2,33 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Necesario para usar navigate
-import { FaHome, FaCalendar, FaPlane, FaMapMarkedAlt, FaSuitcase, FaFileInvoice, FaTicketAlt, FaTruck, FaClipboardList, FaUser, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Asegúrate de importar los íconos
+import { FaHome, FaPlane,FaCalendar ,  FaMapMarkedAlt, FaSuitcase, FaFileInvoice, FaTicketAlt, FaTruck, FaClipboardList, FaUser, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Asegúrate de importar los íconos
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useEffect } from "react";
 
 
 
-function Aviones() {
+function Reservas() {
   const { register, handleSubmit, reset } = useForm(); // Necesario para usar useForm
-  const [aviones, setAviones ] = useState([]); // Estado para guardar los pasajeros
+  const [reserva, setReserva ] = useState([]); // Estado para guardar los pasajeros
   const [loading, setLoading] = useState(false); // Para mostrar un mensaje de carga
-  const [searchQuery, setSearchQuery] = useState(""); // Para buscar pasajeros
+  const [searchQuery, setSearchQuery] =  useState(""); // Para buscar pasajeros
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAvion, setSelectedAvion] = useState(null);
+  const [selectedReserva, setSelectedReserva] = useState(null);
   const navigate = useNavigate(); //inicializamos el navigate
 
 
   // listar pasajeros
-  const fetchAviones = async () => {
+  const fetchReserva = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:4000/api/getAviones',{
+      const response = await axios.get('http://localhost:4000/api/obtenerReservas',{
         withCredentials: true,
       });
       console.log("datos recibidos", response.data);// Muestra los datos recibidos
 
-      setAviones(response.data);
+      setReserva(response.data);
     } catch (error) {
       console.error("Error al cargar los pasajeros", error);
 
@@ -38,17 +38,17 @@ function Aviones() {
   };  
 
   useEffect(() =>{
-    fetchAviones();
+    fetchReserva();
   }, []);
 
 
 
 
 
-  const searchAvion = async () => {
+  const searchReserva = async () => {
     if (!searchQuery.trim()) {
 
-      fetchAviones();
+      fetchReserva();
       console.error("El campo de búsqueda está vacío");
       return;
     }
@@ -57,11 +57,11 @@ function Aviones() {
   
     try { 
        
-      const url = `http://localhost:4000/api/searchAvion/${encodeURIComponent(searchQuery)}`;
+      const url = `http://localhost:4000/api/obtenerReserva/${encodeURIComponent(searchQuery)}`;
       const response = await axios.get(url, { withCredentials: true });
 
     const data = Array.isArray(response.data) ? response.data : [response.data];
-    setAviones(data);
+    setReserva(data);
 
     console.log("Datos actualizados", data);
   } catch (error) {
@@ -74,7 +74,7 @@ function Aviones() {
   }
 };
 
-  const deleteAvion =async (id) => {
+  const deleteReserva =async (id) => {
     if(!id) {
       console.error("ID no es valido");
       return;
@@ -83,11 +83,11 @@ function Aviones() {
     const confirmDelete = window.confirm("Esta seguro de eliminar el registro?");
     if (confirmDelete) {
       try {
-        await axios.delete(`http://localhost:4000/api/deleteAvion/${id}`,{
+        await axios.delete(`http://localhost:4000/api/eliminarReserva/${id}`,{
           withCredentials: true,
         });
 
-        setAviones(aviones.filter((avion) => avion._id !== id));
+        setReserva(reserva.filter((reserva) => reserva._id !== id));
         console.log(`Avion con id: ${id} eliminado`);
       } catch (error) {
         console.error('Error al eliminar avion', error);
@@ -96,57 +96,62 @@ function Aviones() {
   };
 
 
+
   const onSubmit = async (values) => {
-    const { matricula, modelo, fabricante, capacidad, rangoVueloKM, fechaFabricacion } = values;
+    const { vueloId, pasajeroId,  numAsiento, fechaReserva, estadoPago } = values;
   
-    if (aviones.some((avion) => avion.matricula === matricula)) {
+    if (reserva.some((reserva) => reserva.vueloId === vueloId)) {
       console.error("La matrícula ya está registrada.");
       return;
     }
-  
+
     try {
-      const res = await axios.post("http://localhost:4000/api/createAviones", {
-        matricula,
-        modelo,
-        fabricante,
-        capacidad: Number(capacidad),
-        rangoVueloKM: Number(rangoVueloKM),
-        fechaFabricacion: new Date(fechaFabricacion), // Asegurar formato correcto
+      const res = await axios.post("http://localhost:4000/api/crearReserva", {
+        vueloId,
+        pasajeroId,
+        numAsiento:Number(numAsiento),
+        fechaReserva:new Date(fechaReserva),
+        estadoPago,
+
       });
+
+      console.log("Respuesta de la API:", res);
   
       if (res.status === 201) {
-        setAviones((prev) => [...prev, res.data]);
-
+        console.log("vuelo creado, receteado con exito")
+        setReserva((prev) => [...prev, res.data]);
         reset();
-        fetchAviones()
+        fetchReserva();
       }
+
+
     } catch (error) {
       console.error("Error al crear avión", error);
     }
   };
- 
 
-  const handleEditClick = (avion) => {
-    setSelectedAvion(avion);
+
+  const handleEditClick = (vuelo) => {
+    setSelectedReserva(vuelo);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedAvion(null);
+    setSelectedReserva(null);
   };
 
   
-  const updateAvion = async () => {
-    if(!selectedAvion) return;
+  const updateReserva = async () => {
+    if(!selectedReserva) return;
 
     try {
-        console.log("ID del avión a actualizar:", selectedAvion._id);
-        console.log("Datos enviados:", selectedAvion);
+        console.log("ID del avión a actualizar:", selectedReserva._id);
+        console.log("Datos enviados:", selectedReserva);
 
         const response = await axios.put(
-            `http://localhost:4000/api/updateAvion/${selectedAvion._id}`,
-            selectedAvion,
+            `http://localhost:4000/api/actualizarReserva/${selectedReserva._id}`,
+            selectedReserva,
             {
             withCredentials: true,
             headers: { "Content-Type": "application/json" },
@@ -159,7 +164,7 @@ function Aviones() {
 
         closeModal(); // Cierra el modal después de actualizar
 
-        fetchAviones(); //recarga la lista de aviones
+        fetchReserva(); //recarga la lista de vuelos
 
     } catch (error) {
         console.error("Error al actualizar avión", error);
@@ -168,6 +173,7 @@ function Aviones() {
         }
     }
 };
+
 
 
   return (
@@ -181,7 +187,7 @@ function Aviones() {
             <FaCalendar size={20} className="mr-2" /> Agenda
           </span>
           <span onClick={() => navigate("/aviones")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
-            <FaPlane size={20} className="mr-2" /> Aviones
+            <FaPlane size={20} className="mr-2" /> aviones
           </span>
           
           <span onClick={() => navigate("/equipajes")} className="flex items-center cursor-pointer hover:text-blue-950 transition-colors">
@@ -256,67 +262,65 @@ function Aviones() {
       </nav>
 
       <h1 className="text-4xl font-bold text-center p-9">AEROLÍNEA2 SKYGRUP MERN</h1>
-      <h2 className="text-4xl font-bold text-center p-3 m-3">Registro De Aviones</h2>
+      <h2 className="text-4xl font-bold text-center p-3 m-3">Registro De Reservas</h2>
       <form className="max-w-4xl mx-auto" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          {/* Formulario para crear pasajero */}
           <div>
-            <label htmlFor="matricula" className="block text-md ml-2 font-semibold text-white mb-1">Matricula:</label>
-            <input type="text" {...register("matricula", { required: true })}
+            <label htmlFor="vueloId" className="block text-md ml-2 font-semibold text-white mb-1">Vuelo ID:</label>
+            <input type="text" {...register("vueloId", { required: true })}
+            className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
+          </div>
+          <div>
+            <label htmlFor="pasajeroId" className="block text-md ml-2 font-semibold text-white mb-1">pasajero ID </label>
+            <input type="Text" {...register("pasajeroId", { required: true })}
               className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
           </div>
           <div>
-            <label htmlFor="modelo" className="block text-md ml-2 font-semibold text-white mb-1">Modelo</label>
-            <input type="text" {...register("modelo", { required: true })}
+            <label htmlFor="numAsiento" className="block text-md ml-2 font-semibold text-white mb-1">num Asiento</label>
+            <input type="number" {...register("numAsiento", { required: true })}
               className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
           </div>
           <div>
-            <label htmlFor="fabricante" className="block text-md ml-2 font-semibold text-white mb-1">Fabricante</label>
-            <input type="text" {...register("fabricante", { required: true })}
+            <label htmlFor="fechaReserva" className="block text-md ml-2 font-semibold text-white mb-1">Fecha Reserva</label>
+            <input type="Date" {...register("fechaReserva", { required: true })}
               className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
           </div>
           <div>
-            <label htmlFor="capacidad" className="block text-md ml-2 font-semibold text-white mb-1">Capacidad</label>
-            <input type="Number" {...register("capacidad", { required: true })}
+            <label htmlFor="estadoPago" className="block text-md ml-2 font-semibold text-white mb-1">Estado de Pago</label>
+            <input type="Text" {...register("estadoPago", { required: true })}
               className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
           </div>
-          <div>
-            <label htmlFor="rangoVueloKM" className="block text-md ml-2 font-semibold text-white mb-1">Rango Vuelo KM</label>
-            <input type="Number" {...register("rangoVueloKM", { required: true })}
-              className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
-          </div>
-          <div>
-            <label htmlFor="fechaFabricacion" className="block text-md ml-2 font-semibold text-white mb-1">Fecha  De Fabicacion</label>
-            <input type="Date" {...register("fechaFabricacion", { required: true })}
-              className="w-full max-w-md sm:w-auto p-2 md:p-2 ml-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" />
-          </div>
+          
         </div>
         <div className="space-x-4 mt-5">
           <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2">Crear</button>
           <button type="reset" className="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Borrar</button>
-          <button type="button" onClick={fetchAviones} className="text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 font-medium text-sm py-2.5 px-5 me-2 mb-2">Listar</button>
+          <button type="button" onClick={fetchReserva} className="text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 font-medium text-sm py-2.5 px-5 me-2 mb-2">Listar</button>
           <input 
           type="search" 
-          placeholder="Buscar pasajero..." 
+          placeholder="Buscar Reserva.." 
           value={searchQuery} //valor del campo de busqueda
           onChange={(e) => setSearchQuery(e.target.value)} //funcion que se ejecuta al valor intriducido
           className="w-60 p-2 border-2 border-blue-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-lg" />
-          <button type="button"  onClick={searchAvion} className="text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2">Buscar</button>
+          <button type="button"  onClick={searchReserva} className="text-black bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 dark:focus:ring-yellow-900 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2">Buscar</button>
         </div>
       </form>
 
-      <h2 className="text-2xl font-bold text-center p-6">Listado de Aviones</h2>
+      <h2 className="text-2xl font-bold text-center p-6">Listado de Reservas</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto border-collapse border-dark-400">
           <thead>
             <tr>
-              <th className="px-4 py-2 border-b">Id</th>
-              <th className="px-4 py-2 border-b">Matricula</th>
-              <th className="px-4 py-2 border-b">Modelo</th>
-              <th className="px-4 py-2 border-b">Fabricante</th>
-              <th className="px-4 py-2 border-b">Capacidad</th>
-              <th className="px-4 py-2 border-b">Rango de Vuelo (KM)</th>
-              <th className="px-4 py-2 border-b">Fecha de Fabricacion</th>
+              <th className="px-4 py-2 border-b">Id Reserva</th>
+              <th className="px-4 py-2 border-b">pasajeros</th>
+              <th className="px-4 py-2 border-b">Email</th>
+              <th className="px-4 py-2 border-b">Telefono</th>
+              <th className="px-4 py-2 border-b">Vuelo Origen</th>
+              <th className="px-4 py-2 border-b">Vuelo Destino</th>
+              <th className="px-4 py-2 border-b">fecha de vuelo</th>
+              <th className="px-4 py-2 border-b">Asiento</th>
+              <th className="px-4 py-2 border-b">Fecha Reserva</th>
+              <th className="px-4 py-2 border-b">Estado Pago</th>
               <th className="">Acciones</th>
             </tr>
           </thead>
@@ -325,87 +329,90 @@ function Aviones() {
               <tr>
                 <td colSpan="8" className="px-4 py-2 text-center">Cargando...</td>
               </tr>
-            ) : aviones.length > 0 ? (
-              aviones.map((avion) => (
-                <tr key={avion._id} className="border-b">
-                  <td className="px-4 py-2">{avion._id || "SIN ID"}</td>
-                  <td className="px-4 py-2">{avion.matricula}</td>
-                  <td className="px-4 py-2">{avion.modelo}</td>
-                  <td className="px-4 py-2">{avion.fabricante}</td>
-                  <td className="px-4 py-2">{avion.capacidad}</td>
-                  <td className="px-4 py-2">{avion.rangoVueloKM}</td>
-                  <td className="px-4 py-2">{avion.fechaFabricacion}</td>
-                  <td>
-                    <button onClick={() => deleteAvion(avion._id)} type="button" className="bg-red-700 p-1 ">Eliminar</button>
+            ) : reserva.length > 0 ? (
+              reserva.map((reserva) => (
+                <tr key={reserva._id} className="border-b">
+               <td className="px-4 py-2">{reserva._id || "SIN ID"}</td>
+                <td className=" px-4 py-2 whitespace-nowrap">
+                  {reserva.pasajeroId?.nombres} {reserva.pasajeroId?.apellidos}
+                </td>
+                  <td className="px-4 py-2">{reserva.pasajeroId?.email}</td>
+                  <td className="px-4 py-2">{reserva.pasajeroId?.telefono}</td>
+                  <td className="px-4 py-2">{reserva.vueloId?.origen}</td>
+                  <td className="px-4 py-2">{reserva.vueloId?.destino}</td>
+                  <td className="px-4 py-2">
+                    {reserva.vueloId?.fechaSalida? new Date(reserva.vueloId.fechaSalida).toLocaleDateString() : "Sin fecha"}
+                  </td>
+                  <td className="px-4 py-2">{reserva.numAsiento}</td>
+                  <td className=" px-4 py-2">
+                    {new Date(reserva.fechaReserva).toLocaleDateString()}
+                  </td>
+                  <td className={`px-4 py-2 ${
+                    reserva.estadoPago === "Pagado" ? "text-green-600 font-bold" : "text-red-600 font-bold"}`}>
+                    {reserva.estadoPago}
                   </td>
                   <td>
-                    <button onClick={() => handleEditClick(avion)} type="button" className="bg-teal-600 p-1">Editar</button>
+                    <button onClick={() => deleteReserva(reserva._id)} type="button" className="bg-red-700 p-1 ">Eliminar</button>
+                  </td>
+                  <td>
+                    <button onClick={() => handleEditClick(reserva)} type="button" className="bg-teal-600 p-1">Editar</button>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="8" className="px-4 py-2 text-center">No se encontraron pasajeros</td>
+                <td colSpan="8" className="px-4 py-2 text-center">No se encontraron Vuelos</td>
               </tr>
             )}
           </tbody>
         </table>
-        {isModalOpen && selectedAvion && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-              <h3 className="text-xl font-semibold mb-4 text-black">Editar Avión</h3>
+        {isModalOpen && selectedReserva&& (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg h-[80vh] overflow-y-auto">            
+            <h3 className="text-l font-semibold mb-2 text-black">Editar Reservas </h3>
 
-              <label className="block mb-2 font-medium text-black">Matrícula:</label>
+              <label className="block mb-2 font-medium text-black">ID Pasajero:</label>
               <input
                 type="text"
-                value={selectedAvion?.matricula || ""}
+                value={selectedReserva?.pasajeroId || ""}
                 onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, matricula: e.target.value })}
+                setSelectedReserva({ ...selectedReserva, pasajeroId: e.target.value })}
                 className="w-full border p-2 rounded mb-4 text-black"
               />
 
-              <label className="block mb-2 font-medium text-black">Modelo:</label>
+              <label className="block mb-2 font-medium text-black">Id vuelo</label>
               <input
                 type="text"
-                value={selectedAvion.modelo}
+                value={selectedReserva.vueloId}
                 onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, modelo: e.target.value })}
+                setSelectedReserva({ ...selectedReserva, vueloId: e.target.value })}
                 className="w-full border p-2 rounded mb-4 text-black"
               />
 
-              <label className="block mb-2 font-medium text-black">Fabricante:</label>
-              <input
-                type="text"
-                value={selectedAvion?.fabricante || ""}
-                onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, fabricante: e.target.value })}
-                className="w-full border p-2 rounded mb-4 text-black"
-              />
-
-              <label className="block mb-2 font-medium text-black">Capacidad:</label>
+              <label className="block mb-2 font-medium text-black">num Asiento:</label>
               <input
                 type="number"
-                value={selectedAvion?.capacidad || ""}
+                value={selectedReserva?.numAsiento|| ""}
                 onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, capacidad: e.target.value })}
+                setSelectedReserva({ ...selectedReserva, numAsiento: e.target.value })}
                 className="w-full border p-2 rounded mb-4 text-black"
               />
 
-              <label className="block mb-2 font-medium text-black">rango de vuelo km:</label>
-              <input
-                type="number"
-                value={selectedAvion?.rangoVueloKM || ""}
-                onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, rangoVueloKM: e.target.value })}
-                className="w-full border p-2 rounded mb-4 text-black"
-              />
-
-              <label className="block mb-2 font-medium text-black">Año de Fabricación:</label>
+              <label className="block mb-2 font-medium text-black">Fecha Reserva:</label>
               <input
                 type="date"
-                value={selectedAvion.fechaFabricacion}
+                value={selectedReserva?.fechaReserva || ""}
                 onChange={(e) =>
-                setSelectedAvion({ ...selectedAvion, fechaFabricacion: e.target.value })}
+                setSelectedReserva({ ...selectedReserva, fechaReserva: e.target.value })}
+                className="w-full border p-2 rounded mb-4 text-black"
+              />
+
+              <label className="block mb-2 font-medium text-black">Estador Pago:</label>
+              <input
+                type="date"
+                value={selectedReserva?.estadoPago|| ""}
+                onChange={(e) =>
+                setSelectedReserva({ ...selectedReserva, estadoPago: e.target.value })}
                 className="w-full border p-2 rounded mb-4 text-black"
               />
 
@@ -417,7 +424,7 @@ function Aviones() {
                       Cancelar
                   </button>
                   <button
-                      onClick={updateAvion}
+                      onClick={updateReserva}
                       className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                   >
                       Guardar Cambios
@@ -431,4 +438,4 @@ function Aviones() {
   );
 }
 
-export default Aviones;
+export default Reservas;

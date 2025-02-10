@@ -8,11 +8,10 @@ import cors from "cors";
 import reservaRouter from "./routes/reserva.route.js"
 import vuelosRoutes from "./routes/vuelos.route.js";
 import avionRoutes from "./routes/avion.route.js";
+import agendamientoRouter from "./routes/agendamiento.route.js";
 
 
-
-const app = express(); //inicializa el servidor 
-
+const app = express();
 
 
 app.use(cors(
@@ -22,14 +21,17 @@ app.use(cors(
     }
 ))
 
-app.use(morgan('dev')); // esto muestra la peticiones  en el servidor 
-app.use('/api', authRoutes);
-app.use(cookieParser());
+app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
+
+
+app.use('/api', authRoutes);
 app.use('/api', pasajerosRoutes);
 app.use('/api', reservaRouter);  
 app.use('/api', vuelosRoutes);
 app.use('/api', avionRoutes);
+app.use('/api',agendamientoRouter);
 
 
 export default app;
